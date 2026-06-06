@@ -5474,6 +5474,31 @@ static int memory_stat_show(struct seq_file *m, void *v)
 	return 0;
 }
 
+static ssize_t memory_reclaim_write(struct kernfs_open_file *of, char *buf,
+				    size_t nbytes, loff_t off)
+{
+	struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
+	unsigned int nr_retries = MEM_CGROUP_RECLAIM_RETRIES;
+	unsigned long nr_to_reclaim, nr_reclaimed = 0;
+	int err;
+
+	buf = strstrip(buf);
+	err = page_counter_memparse(buf, "max", &nr_to_reclaim);
+	if (err)
+		return err;
+
+	while (nr_reclaimed < nr_to_reclaim && nr_retries--) {
+		if (signal_pending(current))
+			return -EINTR;
+
+		nr_reclaimed += try_to_free_mem_cgroup_pages(memcg,
+						nr_to_reclaim - nr_reclaimed,
+						GFP_KERNEL, true);
+	}
+
+	return nbytes;
+}
+
 static struct cftype memory_files[] = {
 	{
 		.name = "current",
@@ -5497,6 +5522,11 @@ static struct cftype memory_files[] = {
 		.flags = CFTYPE_NOT_ON_ROOT,
 		.seq_show = memory_max_show,
 		.write = memory_max_write,
+	},
+	{
+		.name = "reclaim",
+		.flags = CFTYPE_NOT_ON_ROOT,
+		.write = memory_reclaim_write,
 	},
 	{
 		.name = "events",
