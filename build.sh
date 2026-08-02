@@ -13,6 +13,8 @@
 #   GCC_VER       gcc version tag, e.g. android-11.0.0_r1 (default)
 #   TC_ROOT       directory where toolchains are stored (default: $HOME/toolchains)
 #   OUT_DIR       kernel out directory (default: out)
+#   DEFCONFIG     kernel defconfig (default: begonia_apatch_defconfig; use
+#                 begonia_user_defconfig for a plain non-APatch build)
 #   CLANG_DIR     preinstalled clang prefix dir (bin/clang expected inside)
 #   GCC_DIR       preinstalled binutils prefix dir (bin/aarch64-linux-android-* inside)
 #   JOBS          build jobs (default: $(nproc))
@@ -43,7 +45,7 @@ ARCH=arm64
 CC=clang
 CLANG_TRIPLE=aarch64-linux-gnu-
 CROSS_COMPILE=aarch64-linux-android-
-DEFCONFIG=begonia_user_defconfig
+DEFCONFIG="${DEFCONFIG:-begonia_apatch_defconfig}"
 
 log() { printf '\033[1;32m[*] %s\033[0m\n' "$*"; }
 
