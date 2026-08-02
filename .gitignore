@@ -127,4 +127,5 @@ kernel/configs/android-*.cfg
 out/
 *.zip
 Anykernel/
+/anykernel/
 clang*

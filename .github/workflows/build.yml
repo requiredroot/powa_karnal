@@ -1,0 +1,64 @@
+name: Build Kernel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build begonia kernel
+    runs-on: ubuntu-latest
+    env:
+      KERNEL_NAME: PoWeR-Kernel-begonia
+      TC_ROOT: ${{ github.workspace }}/toolchains
+      OUT_DIR: out
+      CLANG_VER: clang-r383902
+      GCC_VER: android-11.0.0_r1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential ccache zip unzip cpio python3 flex bison \
+            libssl-dev bc dwarves zstd libelf-dev
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: begonia-${{ github.sha }}
+
+      - name: Setup cache for toolchains
+        id: toolchain-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/toolchains
+          key: toolchains-${{ env.CLANG_VER }}-${{ env.GCC_VER }}
+
+      - name: Build kernel
+        run: |
+          export TC_ROOT="${{ github.workspace }}/toolchains"
+          export CCACHE_DIR="${{ runner.temp }}/ccache"
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Upload flashable zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.KERNEL_NAME }}
+          path: ${{ env.KERNEL_NAME }}-*.zip
+          if-no-files-found: error
+
+      - name: Upload Image.gz-dtb
+        uses: actions/upload-artifact@v4
+        with:
+          name: Image.gz-dtb
+          path: out/arch/arm64/boot/Image.gz-dtb
+          if-no-files-found: error
