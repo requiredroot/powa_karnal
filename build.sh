@@ -180,10 +180,10 @@ supported.patchlevels=
 '; } # end properties
 
 ## shell variables
-block=/dev/block/platform/bootdevice/by-name/boot;
-is_slot_device=0;
-ramdisk_compression=auto;
-patch_vbmeta_flag=auto;
+BLOCK=/dev/block/by-name/boot;
+IS_SLOT_DEVICE=0;
+RAMDISK_COMPRESSION=auto;
+PATCH_VBMETA_FLAG=auto;
 
 ## AnyKernel methods (DO NOT CHANGE)
 # import patching functions/variables - see for reference
@@ -191,8 +191,8 @@ patch_vbmeta_flag=auto;
 
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
-chmod -R 750 \$ramdisk/*;
-chown -R root:root \$ramdisk/*;
+chmod -R 750 \$RAMDISK/*;
+chown -R root:root \$RAMDISK/*;
 
 ## AnyKernel install
 dump_boot;
