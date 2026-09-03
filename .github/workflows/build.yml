@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build begonia kernel
@@ -48,6 +52,15 @@ jobs:
           export CCACHE_DIR="${{ runner.temp }}/ccache"
           chmod +x build.sh
           ./build.sh
+
+      - name: Verify APatch kallsyms requirements
+        run: |
+          if ! grep -q '^CONFIG_KALLSYMS_ALL=y$' "$OUT_DIR/.config"; then
+            echo "::error::CONFIG_KALLSYMS_ALL is not set to y in $OUT_DIR/.config - APatch/KernelPatch requires it"
+            exit 1
+          fi
+          echo "CONFIG_KALLSYMS_ALL=y confirmed"
+          grep -E '^#? ?CONFIG_KALLSYMS' "$OUT_DIR/.config" || true
 
       - name: Upload flashable zip
         uses: actions/upload-artifact@v4
