@@ -276,6 +276,8 @@ static inline int memblock_get_region_node(const struct memblock_region *r)
 phys_addr_t memblock_alloc_nid(phys_addr_t size, phys_addr_t align, int nid);
 phys_addr_t memblock_alloc_try_nid(phys_addr_t size, phys_addr_t align, int nid);
 
+phys_addr_t memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t align, int nid);
+
 phys_addr_t memblock_alloc(phys_addr_t size, phys_addr_t align);
 
 /*

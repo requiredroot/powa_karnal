@@ -1199,6 +1199,26 @@ phys_addr_t __init memblock_alloc_try_nid(phys_addr_t size, phys_addr_t align, i
 	return memblock_alloc_base(size, align, MEMBLOCK_ALLOC_ACCESSIBLE);
 }
 
+/*
+ * Backport of the upstream (4.15+) 3-arg memblock_phys_alloc_try_nid API.
+ *
+ * KernelPatch / APatch resolves this exact symbol to allocate its early-boot
+ * memory. Kernels that lack it make KernelPatch fall back to calling
+ * memblock_alloc_try_nid through a 3-arg function pointer typedef, which
+ * on this 3-arg 4.14 implementation means the call actually works but the
+ * NUMA-node / min-addr semantics are misinterpreted, and KP's early
+ * allocation/mapping ends up corrupting memory -> init killed at boot
+ * ("Attempted to kill init! exitcode=0xb" on MT6785 4.14).
+ *
+ * Providing the real 3-arg symbol lets KP use a correct, native primitive.
+ * Semantics match upstream 4.15+: try to allocate from the given node,
+ * fall back to anywhere in accessible memory.
+ */
+phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t align, int nid)
+{
+	return memblock_alloc_try_nid(size, align, nid);
+}
+
 /**
  * memblock_virt_alloc_internal - allocate boot memory block
  * @size: size of memory block to be allocated in bytes
