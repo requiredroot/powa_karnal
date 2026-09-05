@@ -1045,6 +1045,34 @@ static inline void mark_readonly(void)
 }
 #endif
 
+/*
+ * KP diagnostic: KernelPatch's map code (running at paging_init time, before
+ * any console exists) scans the kernel image for this struct and records its
+ * progress into it.  A late_initcall prints the results so console-ramoops
+ * shows how far KP's early map stage got before going silent.
+ */
+struct kp_diag {
+	char magic[8];		/* "KPDIAG\0" */
+	unsigned int stage;	/* progress marker written by map code */
+	unsigned int alloc_type;
+	unsigned long long start_pa;
+	unsigned long long kimage_voffset;
+	unsigned int count;
+};
+
+struct kp_diag kp_diag_mark __aligned(64) = { .magic = "KPDIAG" };
+
+static int __init kp_diag_print(void)
+{
+	struct kp_diag *d = &kp_diag_mark;
+
+	pr_info("KPDIAg: magic=%.8s stage=0x%08x alloc_type=%u start_pa=0x%llx voff=0x%llx count=%u\n",
+		d->magic, d->stage, d->alloc_type, d->start_pa,
+		d->kimage_voffset, d->count);
+	return 0;
+}
+late_initcall(kp_diag_print);
+
 static int __ref kernel_init(void *unused)
 {
 	int ret;

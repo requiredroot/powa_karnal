@@ -416,6 +416,15 @@ static int __kprobes do_page_fault(unsigned long addr, unsigned int esr,
 	unsigned long vm_flags = VM_READ | VM_WRITE | VM_EXEC;
 	unsigned int mm_flags = FAULT_FLAG_DEFAULT;
 
+	/* KP diagnostic: log every fault taken by init so we can see what
+	 * KernelPatch's hooks made it touch. */
+	if (user_mode(regs) && current->pid == 1)
+		pr_info("KPDIAg: init fault addr=0x%lx esr=0x%x pc=0x%llx lr=0x%llx sp=0x%llx write=%d iabort=%d\n",
+			addr, esr, (unsigned long long)regs->pc,
+			(unsigned long long)regs->regs[30],
+			(unsigned long long)regs->sp,
+			!!(esr & ESR_ELx_WNR), is_el0_instruction_abort(esr));
+
 	if (notify_page_fault(regs, esr))
 		return 0;
 

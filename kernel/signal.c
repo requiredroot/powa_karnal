@@ -2384,6 +2384,13 @@ relock:
 		if (!signr)
 			signr = dequeue_signal(current, &current->blocked, &ksig->info);
 
+		/* KP diagnostic: record every signal delivered to init. */
+		if (signr && current->pid == 1)
+			pr_info("KPDIAg: init sig=%d code=%d errno=%d addr=0x%lx pc=0x%llx\n",
+				signr, ksig->info.si_code, ksig->info.si_errno,
+				(unsigned long)ksig->info.si_addr,
+				(unsigned long long)task_pt_regs(current)->pc);
+
 		if (!signr)
 			break; /* will return 0 */
 
