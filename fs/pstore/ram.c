@@ -391,7 +391,12 @@ static size_t ramoops_write_kmsg_hdr(struct persistent_ram_zone *prz,
 	char *hdr;
 	size_t len;
 
-	len = scnprintf(hdr, sizeof(hdr),
+	/*
+	 * hdr must be a real allocation: scnprintf() into an uninitialised
+	 * pointer here faults __memcpy() inside the panic/oops path and wedges
+	 * the machine until the watchdog fires.
+	 */
+	hdr = kasprintf(GFP_ATOMIC,
 		RAMOOPS_KERNMSG_HDR TVSEC_FMT ".%lu-%c\n",
 		record->time.tv_sec,
 		record->time.tv_nsec / 1000,
