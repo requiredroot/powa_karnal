@@ -1331,6 +1331,7 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 	struct irqaction *old, **old_ptr;
 	unsigned long flags, thread_mask = 0;
 	int ret, nested, shared = 0;
+	bool perf_affine_thread = false;
 
 	if (!desc)
 		return -EINVAL;
@@ -1569,7 +1570,15 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 		}
 
 		if (new->flags & (IRQF_PERF_AFFINE)) {
-			affine_one_perf_thread(new);
+			/*
+			 * Defer affine_one_perf_thread() until desc->lock is
+			 * dropped: it calls set_cpus_allowed_ptr(), which can
+			 * migrate the freshly-created IRQ thread via
+			 * stop_one_cpu() and sleep. Doing that here, under the
+			 * raw desc->lock with IRQs disabled, panics the kernel
+			 * with "scheduling while atomic".
+			 */
+			perf_affine_thread = true;
 			irqd_set(&desc->irq_data, IRQD_PERF_CRITICAL);
 			*old_ptr = new;
 		}
@@ -1621,6 +1630,14 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 	mutex_unlock(&desc->request_mutex);
 
 	irq_setup_timings(desc, new);
+
+	/*
+	 * desc->lock is dropped, so it is now safe to affine the perf-critical
+	 * IRQ thread. The thread is still parked (not yet woken below), so
+	 * set_cpus_allowed_ptr() just updates its mask without a migration.
+	 */
+	if (perf_affine_thread)
+		affine_one_perf_thread(new);
 
 	/*
 	 * Strictly no need to wake it up, but hung_task complains
