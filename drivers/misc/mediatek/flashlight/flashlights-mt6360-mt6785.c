@@ -842,7 +842,14 @@ static ssize_t torchbrightness_show(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "%d\n", mt6360_torch_level_sysfs);
 }
 
-static DEVICE_ATTR_RW(torchbrightness);
+/*
+ * World-writable torch brightness node. The stock DEVICE_ATTR_RW() mode (0644)
+ * restricts writes to root, which forces every torch app on the device to
+ * escalate. Expose the knob to unprivileged writers (apps can now set torch
+ * brightness directly, no su/Magisk needed); reads stay world-readable.
+ * Writes are clamped in torchbrightness_store() regardless of caller.
+ */
+static DEVICE_ATTR(torchbrightness, 0666, torchbrightness_show, torchbrightness_store);
 
 
 /******************************************************************************
