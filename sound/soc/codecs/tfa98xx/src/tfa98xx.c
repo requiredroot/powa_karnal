@@ -2326,11 +2326,20 @@ static void tfa98xx_tapdet_work(struct work_struct *work)
 
 static void tfa98xx_monitor(struct work_struct *work)
 {
-#if 0
 	struct tfa98xx *tfa98xx;
 	enum Tfa98xx_Error error = Tfa98xx_Error_Ok;
 
 	tfa98xx = container_of(work, struct tfa98xx, monitor_work.work);
+
+	/*
+	 * Watch the PA DSP while a stream is active. If it wedges (ACS =
+	 * cold start pending, WDS = watchdog), the speaker stays silent
+	 * until reboot unless we re-init it here. tfa_status() only
+	 * reports DSP_not_running for a genuinely latched DSP, so benign
+	 * I2C errors cannot cause spurious re-inits.
+	 */
+	if (tfa98xx->dsp_fw_state != TFA98XX_DSP_FW_OK)
+		goto reschedule;
 
 	/* Check for tap-detection - bypass monitor if it is active */
 	if (!tfa98xx->input) {
@@ -2347,9 +2356,9 @@ static void tfa98xx_monitor(struct work_struct *work)
 		}
 	}
 
+reschedule:
 	/* reschedule */
 	queue_delayed_work(tfa98xx->tfa98xx_wq, &tfa98xx->monitor_work, 5*HZ);
-#endif
 }
 
 static void tfa98xx_dsp_init(struct tfa98xx *tfa98xx)
@@ -2451,9 +2460,14 @@ static void tfa98xx_dsp_init(struct tfa98xx *tfa98xx)
 				/*
 				 * start monitor thread to check IC status bit
 				 * periodically, and re-init IC to recover if
-				 * needed.
+				 * needed. Begonia's TFA9874 is a family-2
+				 * probus device and needs this just as much
+				 * as family-1 parts: without it a latched DSP
+				 * (ACS/WDS) leaves the speaker silent until
+				 * reboot. Family 0 (external/none DSP) has
+				 * no on-chip status registers to poll.
 				 */
-				if (tfa98xx->tfa->tfa_family == 1)
+				if (tfa98xx->tfa->tfa_family != 0)
 					queue_delayed_work(tfa98xx->tfa98xx_wq,
 						&tfa98xx->monitor_work,
 						1*HZ);
