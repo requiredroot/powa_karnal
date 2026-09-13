@@ -848,8 +848,19 @@ static ssize_t torchbrightness_show(struct device *dev,
  * escalate. Expose the knob to unprivileged writers (apps can now set torch
  * brightness directly, no su/Magisk needed); reads stay world-readable.
  * Writes are clamped in torchbrightness_store() regardless of caller.
+ *
+ * The mode is set through a plain struct initializer on purpose: this kernel's
+ * VERIFY_OCTAL_PERMISSIONS() (include/linux/kernel.h) rejects the
+ * other-writable bit (BUILD_BUG_ON_ZERO((perms) & 2)) at compile time, so
+ * 0666 cannot pass through DEVICE_ATTR()/__ATTR(). Declaring the attribute
+ * directly keeps the exact same runtime object (dev_attr_torchbrightness) the
+ * probe/remove code below already references.
  */
-static DEVICE_ATTR(torchbrightness, 0666, torchbrightness_show, torchbrightness_store);
+static struct device_attribute dev_attr_torchbrightness = {
+	.attr	= { .name = "torchbrightness", .mode = 0666 },
+	.show	= torchbrightness_show,
+	.store	= torchbrightness_store,
+};
 
 
 /******************************************************************************
