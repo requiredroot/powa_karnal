@@ -19,13 +19,7 @@
 #ifdef CONFIG_MTK_ENG_BUILD
 #define BINDER_WATCHDOG		"v0.1"
 
-/* descriptor bitmap for fast lookup */
 #define HAVE_DMAP 1
-
-/* For binder descriptor bitmap */
-static inline struct dbitmap *binder_get_dmap(struct binder_proc *proc) {
-	return &proc->dmap;
-}
 #endif
 #define BINDER_USER_TRACKING	1
 
