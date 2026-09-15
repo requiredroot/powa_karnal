@@ -8,6 +8,15 @@ config ANDROID
 
 if ANDROID
 
+config ANDROID_VENDOR_HOOKS
+	bool "Android Vendor Hooks"
+	default n
+	help
+	  Enable support for vendor specific hooks.
+
+	  This is used by some vendors to improve performance on their devices.
+	  For example, it provides some hooks for scheduler, binder, etc.
+
 config ANDROID_BINDER_IPC
 	bool "Android Binder IPC Driver"
 	depends on MMU && !M68K
@@ -55,5 +64,14 @@ config ANDROID_BINDER_IPC_SELFTEST
 	  alignments.
 
 endif # if ANDROID
+
+config ANDROID_VENDOR_HOOKS
+	bool "Android Vendor Hooks"
+	default n
+	help
+	  Enable support for vendor specific hooks.
+
+	  This is used by some vendors to improve performance on their devices.
+	  For example, it provides some hooks for scheduler, binder, etc.
 
 endmenu
