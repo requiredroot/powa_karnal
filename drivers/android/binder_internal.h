@@ -15,6 +15,9 @@
 
 #ifdef CONFIG_MTK_ENG_BUILD
 #define BINDER_WATCHDOG		"v0.1"
+
+/* descriptor bitmap for fast lookup */
+#define HAVE_DMAP 1
 #endif
 #define BINDER_USER_TRACKING	1
 
