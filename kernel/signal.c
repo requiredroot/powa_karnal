@@ -29,6 +29,7 @@
 #include <linux/syscalls.h>
 #include <linux/ptrace.h>
 #include <linux/signal.h>
+#include <trace/hooks/signal.h>
 #include <linux/signalfd.h>
 #include <linux/ratelimit.h>
 #include <linux/tracehook.h>
