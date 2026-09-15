@@ -29,7 +29,6 @@
 #include <linux/syscalls.h>
 #include <linux/ptrace.h>
 #include <linux/signal.h>
-#include <trace/hooks/signal.h>
 #include <linux/signalfd.h>
 #include <linux/ratelimit.h>
 #include <linux/tracehook.h>
@@ -46,6 +45,16 @@
 #include <linux/cgroup.h>
 #define CREATE_TRACE_POINTS
 #include <trace/events/signal.h>
+
+/*
+ * The vendor hooks have to be declared after the trace events above. The hook
+ * header publishes its own TRACE_SYSTEM/TRACE_INCLUDE_PATH, which
+ * <trace/define_trace.h> would otherwise pick up when re-reading the header in
+ * order to create the signal tracepoints, so it must not be visible while
+ * <trace/events/signal.h> is being turned into tracepoint definitions.
+ */
+#undef CREATE_TRACE_POINTS
+#include <trace/hooks/signal.h>
 
 #include <asm/param.h>
 #include <linux/uaccess.h>
