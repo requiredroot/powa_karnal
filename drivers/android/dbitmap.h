@@ -20,6 +20,7 @@
 #ifndef _LINUX_DBITMAP_H
 #define _LINUX_DBITMAP_H
 #include <linux/bitmap.h>
+#include <linux/kernel.h>
 
 #define NBITS_MIN	BITS_PER_TYPE(unsigned long)
 
@@ -94,10 +95,6 @@ dbitmap_shrink(struct dbitmap *dmap, unsigned long *new, unsigned int nbits)
 }
 
 /* Returns the nbits that a dbitmap can grow to. */
-static inline unsigned int dbitmap_grow_nbits(struct dbitmap *dmap)
-{
-	return dmap->nbits << 1;
-}
 
 static inline void
 dbitmap_grow(struct dbitmap *dmap, unsigned long *new, unsigned int nbits)
