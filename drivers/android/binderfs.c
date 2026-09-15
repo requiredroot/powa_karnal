@@ -61,6 +61,7 @@ enum binderfs_stats_mode {
 
 static const match_table_t tokens = {
 	{ Opt_max, "max=%d" },
+	{ Opt_extended_error, "extended_error" },
 	{ Opt_stats_mode, "stats=%s" },
 	{ Opt_err, NULL     }
 };
