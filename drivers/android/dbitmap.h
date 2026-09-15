@@ -22,7 +22,7 @@
 #include <linux/bitmap.h>
 #include <linux/kernel.h>
 
-#define NBITS_MIN	BITS_PER_TYPE(unsigned long)
+#define NBITS_MIN	__BITS_PER_LONG
 
 struct dbitmap {
 	unsigned int nbits;
