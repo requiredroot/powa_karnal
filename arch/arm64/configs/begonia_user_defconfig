@@ -4504,7 +4504,7 @@ CONFIG_BEGONIA_NFC=y
 # CONFIG_CANNONG_NFC is not set
 # CONFIG_BOMB_NFC is not set
 # CONFIG_CEZANNE_NFC is not set
-CONFIG_EROFS_FS=y
+CONFIG_EROFS_FS_ZIP=y
 
 #
 # Firmware Drivers
