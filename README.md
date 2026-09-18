@@ -34,7 +34,7 @@
 
 | Component | Specification |
 |:---|:---|
-| **Device** | Xiaomi Redmi Note 8 Pro (`begonia` / `begonia_in`) |
+| **Device** | Xiaomi Redmi Note 8 Pro (`begonia` / `begoniain`) |
 | **SoC** | MediaTek MT6785 / Helio G90T (12nm FinFET) |
 | **CPU Architecture** | Octa-Core: 2x Arm Cortex-A76 @ 2.05 GHz + 6x Arm Cortex-A55 @ 2.00 GHz |
 | **GPU** | Arm Mali-G76 MC4 @ 800 MHz |
