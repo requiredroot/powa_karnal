@@ -8,7 +8,7 @@
 [![Maintainer](https://img.shields.io/badge/Maintainer-TXO%20R-purple.svg)](https://github.com/txorav)
 [![License](https://img.shields.io/badge/License-GPLv2-yellow.svg)](COPYING)
 
-**Pox Kernel** is an advanced, rock-solid custom Linux kernel engineered for the **Redmi Note 8 Pro** (`begonia` / `begonia_in`, MediaTek Helio G90T / MT6785).
+**Pox Kernel** is an advanced, rock-solid custom Linux kernel engineered for the **Redmi Note 8 Pro** (`begonia` / `begoniain`, MediaTek Helio G90T / MT6785).
 
 > *"We aim for stability, not for anything else."*
 
